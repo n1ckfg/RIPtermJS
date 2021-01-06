@@ -2,7 +2,8 @@
  * ripterm.js
  * Copyright (c) 2018 Carl Gorringe 
  * http://carl.gorringe.org
- * 12/22/2017 - 2/2018
+ * v1: 1/9/2011
+ * v2: 12/22/2017 - 2/2018
  *
  * Renders RIPscrip v1.54 .RIP files in an HTML canvas or SVG.
  * (work in progress)
@@ -199,7 +200,7 @@ function RIPtermJS (self) {
 
 			// output to ripTextDiv
 			var outText = '';
-			var c=0;
+			var c=1;
 			ripData = [];
 
 			// process one line at a time
@@ -483,10 +484,10 @@ function RIPtermJS (self) {
 		// TODO: make more efficient:
 		// [ ] convert to horizontal scan lines, write/read buffer array directly
 
+		tBuf.fill(0);
 		if (getPixel(x0, y0) == border) { return; }
 		var stack = [{x:x0, y:y0}];
 		var popped, count = 0;
-		tBuf.fill(0);
 
 		while (popped = stack.pop()) {
 			var x = popped.x;   
@@ -997,9 +998,10 @@ function RIPtermJS (self) {
 				var xc = parseRIPint(args, 0);
 				var yc = parseRIPint(args, 2);
 				var xr = parseRIPint(args, 4) || 1; // 0.5
-				var yr = xr * (350/480);  // adjust aspect ratio for 640x350 EGA
-				//drawOvalArc(xc, yc, 0, 360, xr, yr, glob.drawColor, glob.lineThick);
-				drawCircle(xc, yc, 0, 360, xr, yr, glob.drawColor, glob.lineThick);  // TEST
+				var yr = xr * (350/450);  // weird aspect ratio, but fixes SOCCER.RIP
+				//var yr = xr * (350/480);  // aspect ratio for 640x350 EGA
+				drawOvalArc(xc, yc, 0, 360, xr, yr, glob.drawColor, glob.lineThick);
+				//drawCircle(xc, yc, 0, 360, xr, yr, glob.drawColor, glob.lineThick);  // TEST
 				if (svgView) {
 					svgView.appendChild(svgNode('ellipse', {
 						//"cx":(xc+1.0), "cy":(yc+1.0), "rx":xr, "ry":yr,
@@ -1048,7 +1050,8 @@ function RIPtermJS (self) {
 				var sa = parseRIPint(args, 4);
 				var ea = parseRIPint(args, 6);
 				var xr = parseRIPint(args, 8) || 1;
-				var yr = xr * (350/480);  // adjust aspect ratio for 640x350 EGA
+				var yr = xr * (350/450);  // weird aspect ratio
+				//var yr = xr * (350/480);  // aspect ratio for 640x350 EGA
 				drawOvalArc(xc, yc, sa, ea, xr, yr, glob.drawColor, glob.lineThick);
 				if (svgView) {
 					svgView.appendChild(svgNode('path', {
@@ -1097,7 +1100,8 @@ function RIPtermJS (self) {
 				var sa = parseRIPint(args, 4);
 				var ea = parseRIPint(args, 6);
 				var xr = parseRIPint(args, 8) || 1;
-				var yr = xr * (350/480);  // adjust aspect ratio for 640x350 EGA
+				var yr = xr * (350/450);  // weird aspect ratio
+				//var yr = xr * (350/480);  // aspect ratio for 640x350 EGA
 				// TODO: draw & fill pie slice
 				drawOvalArc(xc, yc, sa, ea, xr, yr, glob.drawColor, glob.lineThick, glob.fillColor, glob.fillPattern);
 				if (svgView) {
@@ -1506,6 +1510,7 @@ function RIPtermJS (self) {
 			canvas.style.height = winH + 'px';
 			resetGlob();
 			self.clear();
+			self.start();
 		}
 		else {
 			// exiting fullscreen
@@ -1516,7 +1521,6 @@ function RIPtermJS (self) {
 			resetGlob();
 			self.clear();
 		}
-		self.start();
 	}
 
 	// constructor
